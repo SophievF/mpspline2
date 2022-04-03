@@ -1,10 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-[![Travis build
-status](https://travis-ci.com/obrl-soil/mpspline2.svg?branch=master)](https://travis-ci.com/obrl-soil/mpspline2)
+[![R-CMD-check](https://github.com/obrl-soil/mpspline2/workflows/R-CMD-check/badge.svg)](https://github.com/obrl-soil/mpspline2/actions)
 [![Coverage
 status](https://codecov.io/gh/obrl-soil/mpspline2/branch/master/graph/badge.svg)](https://codecov.io/github/obrl-soil/mpspline2?branch=master)
+[![CRAN](https://www.r-pkg.org/badges/version/mpspline2)](https://cran.r-project.org/package=mpspline2)
+[![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/mpspline2)](https://www.r-pkg.org/pkg/mpspline2)
 
 # mpspline2
 
@@ -16,7 +17,17 @@ attributes measured over discrete, often discontinuous depth intervals.
 
 ## Installation
 
-`devtools::install_github('obrl-soil/mpspline2')`
+Install from CRAN with
+
+``` r
+install.packages('mpspline2')
+```
+
+Install from github with
+
+``` r
+devtools::install_github("obrl-soil/mpspline2")
+```
 
 ## Example
 
@@ -33,7 +44,8 @@ dat
 #> 2   1 20 30   4
 #> 3   1 40 50   3
 #> 4   1 60 70  10
-mpspline_tidy(obj = dat, var_name = 'VAL')$est_dcm
+spl_dat <- mpspline_tidy(obj = dat, var_name = 'VAL')
+spl_dat$est_dcm
 #>     SID UD  LD SPLINED_VALUE
 #> 1.1   1  0   5      6.105160
 #> 1.2   1  5  15      5.618341
@@ -47,7 +59,7 @@ mpspline_tidy(obj = dat, var_name = 'VAL')$est_dcm
 If you get stuck using this package, please post a question on [Stack
 Overflow](https://stackoverflow.com/). This means that others can
 benefit from the discussion, and more people are available to help you.
-You’re welcome to ping me in a comment or on twitter (@obrl\_soil) to
-get my attention.
+You’re welcome to ping me in a comment or on twitter (@obrl_soil) to get
+my attention.
 
------
+------------------------------------------------------------------------

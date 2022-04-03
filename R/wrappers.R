@@ -1,10 +1,10 @@
 #' Spline discrete soils data - multiple sites, compact output
 #'
-#' This function implements the mass-preserving spline method of
-#' \href{http://dx.doi.org/10.1016/S0016-7061(99)00003-8}{Bishop et al
-#' (1999)} for interpolating between measured soil attributes down a soil
-#' profile, across multiple sites' worth of data. It returns a more compact output
-#' object than \code{\link[mpspline2:mpspline]{mpspline()}}.
+#' This function implements the mass-preserving spline method of Bishop \emph{et
+#' al} (1999) (\doi{10.1016/S0016-7061(99)00003-8}) for interpolating between
+#' measured soil attributes down a soil profile, across multiple sites' worth of
+#' data. It returns a more compact output object than
+#' \code{\link[mpspline2:mpspline]{mpspline()}}.
 #' @param obj data.frame or matrix. Column 1 must contain site identifiers.
 #'   Columns 2 and 3 must contain upper and lower sample depths, respectively.
 #'   Subsequent columns will contain measured values for those depths.
@@ -75,11 +75,10 @@ mpspline_compact <- function(obj = NULL, var_name = NULL, lam = 0.1,
 
 #' Spline discrete soils data - multiple sites, tidy output
 #'
-#' This function implements the mass-preserving spline method of
-#' \href{http://dx.doi.org/10.1016/S0016-7061(99)00003-8}{Bishop et al
-#' (1999)} for interpolating between measured soil attributes down a soil
-#' profile, across multiple sites' worth of data. It returns an output object
-#' with tidy data formatting.
+#' This function implements the mass-preserving spline method of Bishop \emph{et
+#' al} (1999) (\doi{10.1016/S0016-7061(99)00003-8}) for interpolating between
+#' measured soil attributes down a soil profile, across multiple sites' worth of
+#' data. It returns an output object with tidy data formatting.
 #' @param obj data.frame or matrix. Column 1 must contain site identifiers.
 #'   Columns 2 and 3 must contain upper and lower sample depths, respectively,
 #'   and be measured in centimeters. Subsequent columns will contain measured
@@ -127,43 +126,51 @@ mpspline_tidy <- function(obj = NULL, var_name = NULL, lam = 0.1,
   splined <- splined[keep]
 
   icm <- lapply(splined, function(i) {
-    data.frame("SID" = i$SID,
-               "DEPTH" = names(i$est_icm),
-               "SPLINED_VALUE" = as.vector(i$est_icm),
-               stringsAsFactors = FALSE)
+    d <- data.frame("SID" = i[[1]],
+                    "DEPTH" = names(i$est_icm),
+                    "SPLINED_VALUE" = as.vector(i$est_icm),
+                    stringsAsFactors = FALSE)
+    names(d)[1] <- names(i[1])[1]
+    d
   })
   icm <- do.call('rbind', icm)
   icm$UD <- as.numeric(substr(icm$DEPTH, 1, 3))
   icm$LD <- as.numeric(substr(icm$DEPTH, 5, 7))
-  icm <- icm[, c('SID', 'UD', 'LD', 'SPLINED_VALUE')]
+  icm <- icm[, c(names(icm[1])[1], 'UD', 'LD', 'SPLINED_VALUE')]
 
   ncm <- lapply(splined, function(i) {
-    data.frame("SID" = i$SID,
-               "UD" = as.numeric(seq(200)),
-               "LD" = seq(200) + 1,
-               "SPLINED_VALUE" = as.vector(i$est_1cm),
-               stringsAsFactors = FALSE)
+    d <- data.frame("SID" = i[[1]],
+                    "UD" = as.numeric(seq(200)),
+                    "LD" = seq(200) + 1,
+                    "SPLINED_VALUE" = as.vector(i$est_1cm),
+                    stringsAsFactors = FALSE)
+    names(d)[1] <- names(i[1])[1]
+    d
   })
   ncm <- do.call('rbind', ncm)
   ncm <- ncm[!is.na(ncm$SPLINED_VALUE), ]
 
   dcm <- lapply(splined, function(i) {
-    data.frame("SID" = i$SID,
-               "DEPTH" = names(i$est_dcm),
-               "SPLINED_VALUE" = as.vector(i$est_dcm),
-               stringsAsFactors = FALSE)
+    d <- data.frame("SID" = i[[1]],
+                    "DEPTH" = names(i$est_dcm),
+                    "SPLINED_VALUE" = as.vector(i$est_dcm),
+                    stringsAsFactors = FALSE)
+    names(d)[1] <- names(i[1])[1]
+    d
   })
   dcm <- do.call('rbind', dcm)
   dcm$UD <- as.numeric(substr(dcm$DEPTH, 1, 3))
   dcm$LD <- as.numeric(substr(dcm$DEPTH, 5, 7))
-  dcm <- dcm[, c('SID', 'UD', 'LD', 'SPLINED_VALUE')]
+  dcm <- dcm[, c(names(dcm)[1], 'UD', 'LD', 'SPLINED_VALUE')]
   dcm <- dcm[!is.na(dcm$SPLINED_VALUE), ]
 
   tmse <- lapply(splined, function(i) {
-    data.frame("SID" = i$SID,
-               "ERROR_TYPE" = names(i$est_err),
-               "ERROR_VALUE" = as.vector(i$est_err),
-               stringsAsFactors = FALSE)
+    d <- data.frame("SID" = i[[1]],
+                    "ERROR_TYPE" = names(i$est_err),
+                    "ERROR_VALUE" = as.vector(i$est_err),
+                    stringsAsFactors = FALSE)
+    names(d)[1] <- names(i[1])[1]
+    d
   })
   tmse <- do.call('rbind', tmse)
 

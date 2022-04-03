@@ -57,10 +57,16 @@ mpspline_datchk <- function(s = NULL, var_name = NULL) {
   }
 
   # remove any horizons where target value missing
-  s <- s[!is.na(s[[var_name]]), ]
+  n_mv <- length(which(is.na(s[[var_name]])))
+  if(n_mv > 0) {
+    message(n_mv, " depth range(s) with missing analytical data removed from ", sid, '.')
+    s <- s[!is.na(s[[var_name]]), ]
+    nrs <- nrs - n_mv
+  }
 
-  # replace any missing surface value
+  # replace any missing surface value for upper depth
   if(is.na(s[[2]][1])) {
+    message("Missing surface upper depth replaced with 0 in ", sid, '.')
     s[[2]][1] <- 0
   }
 
@@ -68,17 +74,36 @@ mpspline_datchk <- function(s = NULL, var_name = NULL) {
   if(is.na(s[[3]][nrs])) {
     # NB more conservative than existing approach (stretches from last ud to
     # either 150 or 200cm), but ud + 10cm is more realistic
+    message("Missing deepest lower depth replaced with (deepest upper depth + 10) in ", sid, ".")
     s[[3]][nrs] <- s[[2]][nrs] + 10
   }
 
-  # remove any horizons with -ve depths
-  s <- s[!(s[[2]] < 0 | s[[3]] < 0), ]
+  # remove any horizons with -ve depths (e.g. organic horizons)
+  n_negd <- length(which((s[[2]] < 0 | s[[3]] < 0)))
+  if(n_negd > 0) {
+    message(n_negd, " depth range(s) with negative depths removed from ", sid, '.')
+    s <- s[!(s[[2]] < 0 | s[[3]] < 0), ]
+  }
+
+  # remove any horizons with 0-thickness depths (same UD and LD)
+  n_0th <- length(which(s[[2]] == s[[3]]))
+  if(n_0th > 0) {
+    message(n_0th, " depth range(s) with thickness of 0 removed from ", sid, '.')
+    s <- s[!(s[[2]] == s[[3]]), ]
+  }
+
+  # remove any horizons where upper depth > lower depth
+  bkwrds <- length(which(s[[2]] > s[[3]]))
+  if(bkwrds > 0) {
+    message(bkwrds, " depth ranges removed from ", sid, " as upper depth exceeded lower depth.")
+    s <- s[!(s[[2]] > s[[3]]), ]
+  }
 
   # sort by ud, ld
   s <- s[order(s[[2]], s[[3]]), ]
   rownames(s) <- NULL
 
-  # Drop sites with overlapping data depth ranges
+  # Drop sites with overlapping data depth ranges (user should fix)
   if(nrs > 1) {
     if(any(s[[2]][2:nrs] < s[[3]][1:(nrs - 1)], na.rm = TRUE)) {
       message("Overlapping depth ranges detected in site ", sid, '.')
@@ -294,10 +319,9 @@ mpspline_rmse1 <- function(s = NULL, p = NULL, var_name = NULL) {
 
 #' Spline discrete soils data - single site
 #'
-#' This function implements the mass-preserving spline method of
-#' \href{http://dx.doi.org/10.1016/S0016-7061(99)00003-8}{Bishop et al (1999)}
-#' for interpolating between measured soil attributes down a single soil
-#' profile.
+#' This function implements the mass-preserving spline method of Bishop \emph{et
+#' al} (1999) (\doi{10.1016/S0016-7061(99)00003-8}) for interpolating between
+#' measured soil attributes down a single soil profile.
 #' @param site data frame containing data for a single soil profile.
 #'   Column 1 must contain site identifiers. Columns 2 and 3 must contain upper
 #'   and lower sample depths, respectively, measured in centimeters. Subsequent
@@ -383,10 +407,10 @@ mpspline_one <- function(site = NULL, var_name = NULL, lam = 0.1,
 
 #' Spline discrete soils data - multiple sites
 #'
-#' This function implements the mass-preserving spline method of
-#' \href{http://dx.doi.org/10.1016/S0016-7061(99)00003-8}{Bishop et al
-#' (1999)} for interpolating between measured soil attributes down a soil
-#' profile, across multiple sites' worth of data.
+#' This function implements the mass-preserving spline method of Bishop \emph{et
+#' al} (1999) (\doi{10.1016/S0016-7061(99)00003-8}) for interpolating between
+#' measured soil attributes down a soil profile, across multiple sites' worth of
+#' data.
 #' @param obj data.frame or matrix. Column 1 must contain site
 #'   identifiers. Columns 2 and 3 must contain upper and lower sample depths,
 #'   respectively. Subsequent columns will contain measured values for those

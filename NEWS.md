@@ -1,3 +1,18 @@
+# v. 0.1.6
+
+  * `mpspline_datchk()` bugfix per PR 2
+
+
+# v. 0.1.5 [CRAN]
+
+  * `mpspline_datchk()` now removes 0-thickness horizons (where upper and lower depths are identical)
+  * `mpspline2_datchk()` now removes horizons where upper depth is greater than lower depth
+  * `mpspline_datchk()` now returns messages about each edit made to the input data
+
+# v. 0.1.4
+
+  * bugfix for `mpspline_tidy()`, now handles input profile ID column names correctly.
+
 # v. 0.1.3
 
   * output styles other than default shifted to wrapper functions
